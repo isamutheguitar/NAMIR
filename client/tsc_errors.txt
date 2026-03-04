@@ -1,0 +1,3 @@
+src/components/LibraryView.tsx(6,33): error TS6133: 'ExternalLink' is declared but its value is never read.
+src/components/LibraryView.tsx(6,47): error TS6133: 'ChevronUp' is declared but its value is never read.
+src/components/LibraryView.tsx(6,58): error TS6133: 'ChevronDown' is declared but its value is never read.

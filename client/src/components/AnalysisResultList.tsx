@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import type { AnalysisResult, NamMetadata, IrMetadata } from '../types';
+import type { AnalysisResult } from '../types';
 import { Settings, FileAudio, CheckCircle2, Edit3, Search, Database, Loader2, Link as LinkIcon, FileText, Tag } from 'lucide-react';
 
 
 interface AnalysisResultListProps {
     results: AnalysisResult[];
     onUpdate: (id: string, updates: Partial<AnalysisResult>) => void;
+    token: string;
 }
 
-export const AnalysisResultList = ({ results, onUpdate }: AnalysisResultListProps) => {
+export const AnalysisResultList = ({ results, onUpdate, token }: AnalysisResultListProps) => {
     const [isSaving, setIsSaving] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -18,16 +19,13 @@ export const AnalysisResultList = ({ results, onUpdate }: AnalysisResultListProp
     const generateSuggestedName = (item: AnalysisResult): string => {
         const parts: string[] = [];
         if (item.type === 'nam') {
-            const m = item.metadata as NamMetadata;
-            if (m.gear_make && m.gear_make !== 'Unknown') parts.push(m.gear_make);
-            if (m.cabinet && m.cabinet !== 'Unknown') parts.push(m.cabinet);
-            if (m.mic && m.mic !== 'Unknown') parts.push(m.mic);
-            if (m.author && m.author !== 'Unknown') parts.push(m.author);
+            if (item.amp && item.amp !== 'Unknown') parts.push(item.amp);
+            if (item.cabinet && item.cabinet !== 'Unknown') parts.push(item.cabinet);
+            if (item.mic && item.mic !== 'Unknown') parts.push(item.mic);
+            if (item.author && item.author !== 'Unknown') parts.push(item.author);
         } else {
-            const m = item.metadata as IrMetadata;
-            if (m.speaker && m.speaker !== 'Unknown') parts.push(m.speaker);
-            if (m.mic_model && m.mic_model !== 'Unknown') parts.push(m.mic_model);
-            if (m.position) parts.push(m.position);
+            if (item.cabinet && item.cabinet !== 'Unknown') parts.push(item.cabinet);
+            if (item.mic && item.mic !== 'Unknown') parts.push(item.mic);
         }
         return parts.join('_').replace(/\s+/g, '_');
     };
@@ -48,12 +46,11 @@ export const AnalysisResultList = ({ results, onUpdate }: AnalysisResultListProp
         setIsSaving(true);
         setSaveSuccess(false);
         try {
-            // Assuming API server runs on port 5000 in dev, or relative path in production
-            const baseUrl = window.location.hostname === 'localhost' ? 'http://localhost:5000' : '';
-            const response = await fetch(`${baseUrl}/api/save-to-sheet`, {
+            const response = await fetch('/api/save-to-sheet', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({ results }),
             });
@@ -94,7 +91,7 @@ export const AnalysisResultList = ({ results, onUpdate }: AnalysisResultListProp
                     {isSaving ? 'Saving...' : saveSuccess ? 'Saved!' : 'Save to Spreadsheet'}
                 </button>
             </div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full box-border overflow-hidden p-1">
                 {results.map((item) => {
                     const currentSuggestedName = generateSuggestedName(item);
                     const bestSuggestedName = item.editedName || currentSuggestedName;
@@ -103,7 +100,7 @@ export const AnalysisResultList = ({ results, onUpdate }: AnalysisResultListProp
                     return (
                         <div
                             key={item.id}
-                            className={`bg-neutral-800 border rounded-xl p-5 hover:bg-neutral-800/80 transition-all flex flex-col ${isEdited
+                            className={`bg-neutral-800 border rounded-xl p-4 sm:p-5 hover:bg-neutral-800/80 transition-all flex flex-col ${isEdited
                                 ? 'border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.1)]'
                                 : 'border-neutral-700 hover:border-indigo-500/50'
                                 }`}
@@ -118,8 +115,8 @@ export const AnalysisResultList = ({ results, onUpdate }: AnalysisResultListProp
                                         <FileAudio className="w-5 h-5 text-emerald-400" />
                                     </div>
                                 )}
-                                <div className="truncate w-full relative group">
-                                    <span className="text-sm font-mono text-neutral-400 truncate w-full block">
+                                <div className="truncate w-full relative group min-w-0 flex-grow">
+                                    <span className="text-sm font-mono text-neutral-400 truncate w-full block break-all">
                                         {item.originalName}
                                     </span>
                                     {/* Tooltip for long filenames */}
@@ -133,11 +130,11 @@ export const AnalysisResultList = ({ results, onUpdate }: AnalysisResultListProp
                                     href={getSearchUrl(item)}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="ml-auto shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-neutral-700/50 hover:bg-indigo-500/20 text-neutral-300 hover:text-indigo-300 text-xs font-medium rounded-md transition-colors border border-neutral-600 hover:border-indigo-500/30"
+                                    className="ml-auto shrink-0 flex items-center justify-center w-10 h-10 sm:w-auto sm:px-3 sm:py-1.5 bg-neutral-700/50 hover:bg-indigo-500/20 text-neutral-300 hover:text-indigo-300 text-xs font-medium rounded-md transition-colors border border-neutral-600 hover:border-indigo-500/30"
                                     title="Search directly on TONE3000"
                                 >
-                                    <Search className="w-3.5 h-3.5" />
-                                    <span>Find</span>
+                                    <Search className="w-4 h-4" />
+                                    <span className="hidden sm:inline">Find</span>
                                 </a>
                             </div>
 
@@ -149,11 +146,21 @@ export const AnalysisResultList = ({ results, onUpdate }: AnalysisResultListProp
                                             <label className="text-[10px] text-neutral-500 uppercase font-bold mb-1 block">Amp / Pedal</label>
                                             <input
                                                 type="text"
-                                                value={(item.metadata as NamMetadata).gear_make || ''}
-                                                onChange={(e) => onUpdate(item.id, {
-                                                    metadata: { ...(item.metadata as NamMetadata), gear_make: e.target.value }
-                                                })}
+                                                value={item.amp || ''}
+                                                onChange={(e) => onUpdate(item.id, { amp: e.target.value })}
                                                 className="w-full bg-neutral-900 border border-neutral-700 rounded px-2 py-1.5 focus:border-indigo-500 outline-none"
+                                            />
+                                        </div>
+
+                                        {/* Model Editor */}
+                                        <div>
+                                            <label className="text-[10px] text-neutral-500 uppercase font-bold mb-1 block">Model (Kemper, Tonex, etc.)</label>
+                                            <input
+                                                type="text"
+                                                value={item.model || ''}
+                                                onChange={(e) => onUpdate(item.id, { model: e.target.value })}
+                                                className="w-full bg-neutral-900 border border-neutral-700 rounded px-2 py-1.5 focus:border-indigo-500 outline-none"
+                                                placeholder="Kemper"
                                             />
                                         </div>
 
@@ -161,10 +168,8 @@ export const AnalysisResultList = ({ results, onUpdate }: AnalysisResultListProp
                                         <div>
                                             <label className="text-[10px] text-neutral-500 uppercase font-bold mb-1 block">Capture Type</label>
                                             <select
-                                                value={(item.metadata as NamMetadata).capture_type}
-                                                onChange={(e) => onUpdate(item.id, {
-                                                    metadata: { ...(item.metadata as NamMetadata), capture_type: e.target.value as any }
-                                                })}
+                                                value={item.tone || 'Full Rig'}
+                                                onChange={(e) => onUpdate(item.id, { tone: e.target.value })}
                                                 className="w-full bg-neutral-900 border border-neutral-700 rounded px-2 py-1.5 focus:border-indigo-500 outline-none text-indigo-300"
                                             >
                                                 <option value="Full Rig">Full Rig</option>
@@ -180,10 +185,8 @@ export const AnalysisResultList = ({ results, onUpdate }: AnalysisResultListProp
                                             <label className="text-[10px] text-neutral-500 uppercase font-bold mb-1 block">Cabinet</label>
                                             <input
                                                 type="text"
-                                                value={(item.metadata as NamMetadata).cabinet || ''}
-                                                onChange={(e) => onUpdate(item.id, {
-                                                    metadata: { ...(item.metadata as NamMetadata), cabinet: e.target.value }
-                                                })}
+                                                value={item.cabinet || ''}
+                                                onChange={(e) => onUpdate(item.id, { cabinet: e.target.value })}
                                                 className="w-full bg-neutral-900 border border-neutral-700 rounded px-2 py-1.5 focus:border-indigo-500 outline-none"
                                                 placeholder="Unknown"
                                             />
@@ -194,10 +197,8 @@ export const AnalysisResultList = ({ results, onUpdate }: AnalysisResultListProp
                                             <label className="text-[10px] text-neutral-500 uppercase font-bold mb-1 block">Microphone</label>
                                             <input
                                                 type="text"
-                                                value={(item.metadata as NamMetadata).mic || ''}
-                                                onChange={(e) => onUpdate(item.id, {
-                                                    metadata: { ...(item.metadata as NamMetadata), mic: e.target.value }
-                                                })}
+                                                value={item.mic || ''}
+                                                onChange={(e) => onUpdate(item.id, { mic: e.target.value })}
                                                 className="w-full bg-neutral-900 border border-neutral-700 rounded px-2 py-1.5 focus:border-indigo-500 outline-none text-emerald-300"
                                                 placeholder="Unknown"
                                             />
@@ -210,10 +211,8 @@ export const AnalysisResultList = ({ results, onUpdate }: AnalysisResultListProp
                                             <label className="text-[10px] text-neutral-500 uppercase font-bold mb-1 block">Speaker / Cabinet</label>
                                             <input
                                                 type="text"
-                                                value={(item.metadata as IrMetadata).speaker || ''}
-                                                onChange={(e) => onUpdate(item.id, {
-                                                    metadata: { ...(item.metadata as IrMetadata), speaker: e.target.value }
-                                                })}
+                                                value={item.cabinet || ''}
+                                                onChange={(e) => onUpdate(item.id, { cabinet: e.target.value })}
                                                 className="w-full bg-neutral-900 border border-neutral-700 rounded px-2 py-1.5 focus:border-indigo-500 outline-none"
                                             />
                                         </div>
@@ -223,18 +222,11 @@ export const AnalysisResultList = ({ results, onUpdate }: AnalysisResultListProp
                                             <label className="text-[10px] text-neutral-500 uppercase font-bold mb-1 block">Microphone</label>
                                             <input
                                                 type="text"
-                                                value={(item.metadata as IrMetadata).mic_model || ''}
-                                                onChange={(e) => onUpdate(item.id, {
-                                                    metadata: { ...(item.metadata as IrMetadata), mic_model: e.target.value }
-                                                })}
+                                                value={item.mic || ''}
+                                                onChange={(e) => onUpdate(item.id, { mic: e.target.value })}
                                                 className="w-full bg-neutral-900 border border-neutral-700 rounded px-2 py-1.5 focus:border-indigo-500 outline-none text-emerald-300"
                                             />
                                         </div>
-
-                                        {/* Pos/Dist static display for now as it's less prioritized for direct edit */}
-                                        <p className="text-xs text-neutral-500 pt-1">
-                                            Pos/Dist: {(item.metadata as IrMetadata).position || '?'} / {(item.metadata as IrMetadata).distance || '?'}
-                                        </p>
                                     </div>
                                 )}
 

@@ -22,13 +22,19 @@ export interface AnalysisResult {
     id: string;
     originalName: string;
     type: 'nam' | 'ir';
-    metadata: NamMetadata | IrMetadata;
     suggestedName: string;
     editedName?: string;
+    amp?: string;
+    model?: string;
+    cabinet?: string;
+    author?: string;
+    mic?: string;
+    tone?: string;
     sourceUrl?: string;
     captureInfo?: string;
     userMemo?: string;
     rate?: number;
+    metadata?: any;
 }
 
 export interface LibraryItem {
@@ -46,4 +52,11 @@ export interface LibraryItem {
     userMemo: string;
     mic: string;
     rate: number;
+}
+
+export interface CustomDictItem {
+    id?: string;
+    category: string;
+    keyword: string;
+    name: string;
 }

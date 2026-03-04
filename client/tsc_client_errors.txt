@@ -1,0 +1,12 @@
+src/components/LibraryView.tsx(4,23): error TS6133: 'Calendar' is declared but its value is never read.
+src/components/LibraryView.tsx(4,46): error TS6133: 'LinkIcon' is declared but its value is never read.
+src/components/LibraryView.tsx(5,20): error TS6133: 'ExternalLink' is declared but its value is never read.
+src/components/LibraryView.tsx(5,52): error TS6133: 'ChevronUp' is declared but its value is never read.
+src/components/LibraryView.tsx(5,63): error TS6133: 'ChevronDown' is declared but its value is never read.
+src/components/LibraryView.tsx(6,5): error TS6133: 'Edit3' is declared but its value is never read.
+src/components/LibraryView.tsx(6,12): error TS6133: 'Save' is declared but its value is never read.
+src/components/LibraryView.tsx(6,29): error TS6133: 'CheckCircle2' is declared but its value is never read.
+src/components/LibraryView.tsx(22,12): error TS6133: 'isEditing' is declared but its value is never read.
+src/components/LibraryView.tsx(24,12): error TS6133: 'isSaving' is declared but its value is never read.
+src/components/LibraryView.tsx(25,12): error TS6133: 'saveStatus' is declared but its value is never read.
+src/components/LibraryView.tsx(49,11): error TS6133: 'handleSave' is declared but its value is never read.

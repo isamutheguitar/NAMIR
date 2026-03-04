@@ -5,9 +5,10 @@ import type { AnalysisResult } from '../types';
 
 interface FileUploaderProps {
     onResults: (results: AnalysisResult[]) => void;
+    token: string;
 }
 
-export const FileUploader = ({ onResults }: FileUploaderProps) => {
+export const FileUploader = ({ onResults, token }: FileUploaderProps) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
@@ -29,10 +30,11 @@ export const FileUploader = ({ onResults }: FileUploaderProps) => {
                 })
             );
 
-            const response = await fetch('http://localhost:5000/api/analyze', {
+            const response = await fetch('/api/analyze', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({ files: filesPayload }),
             });

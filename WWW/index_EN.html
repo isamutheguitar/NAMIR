@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAMIR v1.0.0 - Official Release</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: '#0f1115',
+                        darker: '#0a0b0e',
+                        card: '#1a1d24',
+                        nam: '#6366f1', // Electric Indigo
+                        ir: '#10b981',  // Emerald Mint
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0f1115; color: #e2e8f0; }
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .glow-nam { box-shadow: 0 0 20px rgba(99, 102, 241, 0.15); }
+        .glow-ir { box-shadow: 0 0 20px rgba(16, 185, 129, 0.15); }
+        .border-gradient-namir {
+            position: relative;
+        }
+        .border-gradient-namir::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 1rem;
+            padding: 1px;
+            background: linear-gradient(45deg, #6366f1, #10b981);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-nam selection:text-white">
+
+    <!-- Header / Navbar -->
+    <header class="fixed w-full top-0 z-50 bg-dark/80 backdrop-blur-md border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded bg-gradient-to-br from-nam to-ir flex items-center justify-center font-display font-bold text-white tracking-tighter">N</div>
+                <span class="font-display font-bold text-xl tracking-widest text-white">NAMIR</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="text-xs font-mono px-3 py-1 bg-gray-800 text-gray-300 rounded-full border border-gray-700">v1.0.0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative pt-40 pb-20 lg:pt-48 lg:pb-32 overflow-hidden flex flex-col items-center text-center px-6">
+        <!-- Background Glow -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-nam/20 via-ir/10 to-transparent opacity-50 blur-3xl -z-10"></div>
+        
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-800/50 border border-gray-700 mb-8 backdrop-blur-sm">
+            <span class="w-2 h-2 rounded-full bg-nam animate-pulse"></span>
+            <span class="text-sm font-medium tracking-wide text-gray-300 uppercase">Official Release</span>
+        </div>
+        
+        <h1 class="font-display text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-6 leading-tight max-w-5xl">
+            Stop Imagining the Sound.<br/>
+            <span class="bg-gradient-to-r from-nam to-ir text-gradient">Start Commanding Your Library.</span>
+        </h1>
+        
+        <p class="text-lg md:text-xl text-gray-400 max-w-3xl leading-relaxed mb-10">
+            Welcome to the future of tone management. NAMIR (Neural Amp Modeler & Impulse Response Manager) is the ultimate personal asset browser and database, designed for guitarists who refuse to get lost in a sea of cryptic filenames.
+            <br/><br/>
+            Transform your cluttered folders of NAM models and IR files into a high-end, searchable gear catalog. <span class="text-white font-medium">Built by a guitarist, for guitarists.</span>
+        </p>
+    </section>
+
+    <!-- Core Features Section -->
+    <section class="py-24 bg-darker relative border-t border-gray-800/50">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="font-display text-3xl md:text-4xl font-bold text-white mb-4">? Core Features: The "Brain" of Your Rig</h2>
+                <div class="h-1 w-24 bg-gradient-to-r from-nam to-ir mx-auto rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-card p-8 rounded-2xl border border-gray-800 hover:border-gray-700 transition-colors group relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-nam/10 rounded-full blur-3xl -mr-16 -mt-16 transition-opacity group-hover:opacity-100 opacity-50"></div>
+                    <div class="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center mb-6 text-nam border border-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">1. Intelligent Auto-Analyzer Engine</h3>
+                    <p class="text-gray-400 text-sm mb-4 leading-relaxed">
+                        Stop guessing what <code class="bg-gray-800/80 px-1.5 py-0.5 rounded text-gray-300 font-mono text-xs">Brit800_V30_57_v2.nam</code> means. NAMIRÅfs dedicated "Gear Dictionary" instantly extracts deep metadata from cryptic filenames.
+                    </p>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        It effortlessly identifies <strong class="text-gray-200 font-medium">Amps & Modelers</strong> (Marshall, Kemper, Axe-FX), specific <strong class="text-gray-200 font-medium">Cabs & Speakers</strong> (V30), industry-standard <strong class="text-gray-200 font-medium">Microphones</strong> (SM57, U87), and <strong class="text-gray-200 font-medium">Pedals</strong> (TS9, Klon).
+                    </p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="bg-card p-8 rounded-2xl border border-gray-800 hover:border-gray-700 transition-colors group relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-ir/10 rounded-full blur-3xl -mr-16 -mt-16 transition-opacity group-hover:opacity-100 opacity-50"></div>
+                    <div class="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center mb-6 text-ir border border-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">2. Boutique-Inspired Visual Interface</h3>
+                    <p class="text-gray-400 text-sm mb-4 leading-relaxed">
+                        NAMIR isn't just a file manager; itÅfs a seamless extension of your pedalboard, fully optimized for PC, Smartphone, and Tablet.
+                    </p>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Experience a sleek dark mode featuring <span class="text-nam font-medium">"Electric Indigo"</span> and <span class="text-ir font-medium">"Emerald Mint"</span> color-coding?reminiscent of high-end boutique pedal LEDs. Toggle instantly between a visual <strong class="text-gray-200 font-medium">Grid Mode</strong> and a lightning-fast <strong class="text-gray-200 font-medium">List Mode</strong>.
+                    </p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="bg-card p-8 rounded-2xl border border-gray-800 hover:border-gray-700 transition-colors group relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-nam/10 rounded-full blur-3xl -mr-16 -mt-16 transition-opacity group-hover:opacity-100 opacity-50"></div>
+                    <div class="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center mb-6 text-nam border border-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">3. Professional Asset Editing & Metadata</h3>
+                    <p class="text-gray-400 text-sm mb-4 leading-relaxed">
+                        Is the auto-analysis not 100% perfect? Correct it instantly right on the gear card. Save source URLs, capture environment details (like specific Drive settings or tube types), and add your personal 5-star ratings.
+                    </p>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Thanks to the <strong class="text-gray-200 font-medium">Smart Upsert System</strong>, re-dropping a file automatically retrieves your previous notes, ensuring your "perfect tweaks" are never lost.
+                    </p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="bg-card p-8 rounded-2xl border border-gray-800 hover:border-gray-700 transition-colors group relative overflow-hidden border-gradient-namir">
+                    <div class="absolute inset-0 bg-gradient-to-br from-nam/5 to-ir/5 -z-10"></div>
+                    <div class="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center mb-6 text-white border border-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">4. Rock-Solid Cloud Integration</h3>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        Using <span class="text-ir font-semibold">Google Sheets</span> as a backend database means your data is safe, portable, and infinitely backed up. No more character limits?just pure, structured data that syncs across all your devices seamlessly.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Use Cases Section -->
+    <section class="py-24 bg-dark relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="font-display text-3xl font-bold text-white mb-12 text-center">?? How NAMIR Ignites Your Creativity</h2>
+            
+            <div class="flex flex-col gap-6">
+                <!-- Case 1 -->
+                <div class="flex flex-col md:flex-row gap-6 items-center bg-card rounded-2xl p-6 border border-gray-800">
+                    <div class="w-16 h-16 shrink-0 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700">
+                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-white mb-2">During Mixdown (LUNA, Studio One, etc.)</h4>
+                        <p class="text-gray-400 text-sm">When you need "that thick Neumann-mic'd crunch" right now, don't hunt through folders. Find it in NAMIR in seconds via your 5-star ratings and custom tags.</p>
+                    </div>
+                </div>
+
+                <!-- Case 2 -->
+                <div class="flex flex-col md:flex-row gap-6 items-center bg-card rounded-2xl p-6 border border-gray-800">
+                    <div class="w-16 h-16 shrink-0 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700">
+                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-white mb-2">Hardware Prep (M-VAVE, Zoom, Line6)</h4>
+                        <p class="text-gray-400 text-sm">Selecting the "First-Tier IRs" for your M-VAVE IR BOX or Zoom MS-50G? Use NAMIR to curate the perfect setlist based on accurate cabinet and mic data.</p>
+                    </div>
+                </div>
+
+                <!-- Case 3 -->
+                <div class="flex flex-col md:flex-row gap-6 items-center bg-card rounded-2xl p-6 border border-gray-800">
+                    <div class="w-16 h-16 shrink-0 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700">
+                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-white mb-2">Content Creation</h4>
+                        <p class="text-gray-400 text-sm">Planning a review for your YouTube channel? Instantly recall exactly which NAM model was used in a previous video, including the author's original capture notes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Developer Message Section -->
+    <section class="py-24 bg-darker border-t border-gray-800/50">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <svg class="w-10 h-10 mx-auto text-gray-600 mb-6" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+            <p class="text-2xl md:text-3xl font-medium text-gray-300 leading-snug italic mb-8">
+                "The sounds you played yesterday are your greatest assets. NAMIR was born to ensure those assets are never buried in a folder again. ItÅfs time to stop 'searching' and start 'creating.'<br/><br/><span class="text-white not-italic font-bold">Which 5-star rig will you fire up today?</span>"
+            </p>
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-800 border border-gray-700 mb-4 overflow-hidden">
+                <!-- Avatar placeholder / icon -->
+                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            </div>
+            <div class="text-gray-400 font-medium">Message from Isamu</div>
+            <div class="text-sm text-gray-500">Developer & Guitarist</div>
+        </div>
+    </section>
+
+    <!-- Call to Action / Footer -->
+    <footer class="border-t border-gray-800 bg-black pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <h2 class="font-display text-3xl font-bold text-white mb-6">Ready to Command Your Tone?</h2>
+            <a href="https://isamutheguitar.com/NAMIR" class="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white text-black font-bold hover:bg-gray-200 transition-transform hover:scale-105 active:scale-95 mb-16">
+                Explore NAMIR Now
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </a>
+            
+            <div class="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-gray-800 text-sm text-gray-500">
+                <div class="flex items-center gap-2 mb-4 md:mb-0">
+                    <div class="w-5 h-5 rounded bg-gradient-to-br from-nam to-ir flex items-center justify-center font-display font-bold text-white text-[10px]">N</div>
+                    <span class="font-display font-bold text-white">NAMIR</span>
+                </div>
+                <p>Copyright &copy; 2026 Isamu (Isamu The Guitar). All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

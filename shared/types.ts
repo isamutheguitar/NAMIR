@@ -6,9 +6,9 @@ export interface NamMetadata {
     capture_type: 'Amp Only' | 'Pedal Only' | 'Amp+Pedal' | 'Full Rig' | 'Other';
     tone_type?: string;
     sample_rate?: number;
-    suggestedName?: string; // ★これを追加！バックエンドからの特製リネーム案の受け皿
-    cabinet?: string;       // ★キャビネット情報を追加！
-    mic?: string;           // ★マイク情報を追加！
+    suggestedName?: string;
+    cabinet?: string;
+    mic?: string;
 }
 
 export interface IrMetadata {
@@ -22,13 +22,18 @@ export interface AnalysisResult {
     id: string;
     originalName: string;
     type: 'nam' | 'ir';
-    metadata: NamMetadata | IrMetadata;
     suggestedName: string;
-    editedName?: string;
-    sourceUrl?: string; // TONE3000 URL etc.
-    captureInfo?: string; // Captured info / Author's notes
-    userMemo?: string; // Personal notes / Tags
-    rate?: number; // 0-5 rating
+    amp?: string;
+    model?: string;
+    cabinet?: string;
+    author?: string;
+    mic?: string;
+    tone?: string;
+    sourceUrl?: string;
+    captureInfo?: string;
+    userMemo?: string;
+    rate?: number;
+    metadata?: any;
 }
 
 export interface LibraryItem {
@@ -46,4 +51,11 @@ export interface LibraryItem {
     userMemo: string;
     mic: string;
     rate: number;
+}
+
+export interface CustomDictItem {
+    id?: string;
+    category: string;
+    keyword: string;
+    name: string;
 }
