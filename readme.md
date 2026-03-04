@@ -25,7 +25,7 @@
 NAMIR is designed for complete private use. You deploy it to your own environment, ensuring your data remains private.
 
 #### 1. Prepare the Database
-1.  Copy the [Google Sheets Template]([LINK_TO_YOUR_SHEET_TEMPLATE]) to your Google Drive and note the Spreadsheet ID from the URL.
+1.  Copy the [Google Sheets Template](https://docs.google.com/spreadsheets/d/1c25qnGrxsQ5iDnAOwKYdZT4X6aK8keAV47cq2u7_VlQ/edit?usp=sharing) to your Google Drive and note the Spreadsheet ID from the URL.
 2.  **Crucial**: Share your spreadsheet with the **Service Account email address** (generated in Step 2) with "Editor" permission.
 
 #### 2. Setup Google Cloud API
@@ -76,7 +76,7 @@ If NAMIR helps you manage your tones better, consider buying me a coffee! Your s
 本ツールは「完全プライベート環境」での運用を前提としています。
 
 #### 1. データベースの準備
-1.  [Googleスプレッドシート・テンプレート]([LINK_TO_YOUR_SHEET_TEMPLATE])を「コピーを作成」して保存。スプレッドシートIDをメモします。
+1.  [Googleスプレッドシート・テンプレート](https://docs.google.com/spreadsheets/d/1c25qnGrxsQ5iDnAOwKYdZT4X6aK8keAV47cq2u7_VlQ/edit?usp=sharing)を「コピーを作成」して保存。スプレッドシートIDをメモします。
 2.  **重要**: コピーしたシートの「共有」設定から、STEP 2で作成する**サービスアカウントのメールアドレス**を「編集者」として追加してください。
 
 #### 2. Google Cloud APIの設定
