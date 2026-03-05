@@ -16,7 +16,9 @@ export interface IrMetadata {
     position?: string;
     distance?: string;
     speaker?: string;
+    model?: string;
 }
+
 
 export interface AnalysisResult {
     id: string;

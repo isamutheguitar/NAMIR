@@ -83,8 +83,10 @@ export const analyzeFile = (
             suggestedName,
             cabinet,
             mic,
+            model: metadata.model || '',
             tone: 'IR',
             metadata
         };
     }
 };
+

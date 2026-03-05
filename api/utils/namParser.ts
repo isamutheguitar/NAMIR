@@ -24,24 +24,53 @@ const guessFromFilename = (filename: string, customDict: any[] = []) => {
 
     // 2. ペダル辞書（マッピングテーブル）
     const pedalDictionary = [
-        { keywords: ["ts9", "tubescreamerts9", "tubescreamer"], name: "TS9 Tube Screamer" },
-        { keywords: ["ts808", "tubescreamer808"], name: "TS808 Tube Screamer" },
+        // --- アンプシミュレータ / プリアンプ系 ---
+        { keywords: ['iridium', 'strymon iridium'], name: 'Strymon Iridium' },
+        { keywords: ['mooer 005', 'brown sound 005', 'micro preamp 005'], name: 'Mooer Micro Preamp 005' },
+        { keywords: ['black secret', 'blacksecret'], name: 'Mooer Black Secret' },
+
+        // --- オーバードライブ / ブースター系 ---
+        { keywords: ['bd-2', 'bd2', 'blues driver', 'bluesdriver'], name: 'BOSS BD-2 Blues Driver' },
+        { keywords: ['od-3', 'od3'], name: 'BOSS OD-3 OverDrive' },
+        { keywords: ['sd-1', 'sd1', 'super overdrive', 'superoverdrive'], name: 'BOSS SD-1 Super Overdrive' },
+        { keywords: ['ts9', 'ts-9', 'tube screamer', 'tubescreamer'], name: 'Ibanez TS9 Tube Screamer' },
+        { keywords: ['ts808', 'ts-808'], name: 'Ibanez TS808 Overdrive Pro' },
+        { keywords: ['od808', 'od-808'], name: 'MAXON OD808 Overdrive' },
+        { keywords: ['spark booster', 'sparkbooster', 'tc spark', 'tcspark'], name: 'TC Electronic Spark Booster' },
+        { keywords: ['ep booster', 'epbooster'], name: 'Xotic EP Booster' },
+        { keywords: ['rc booster', 'rcbooster'], name: 'Xotic RC Booster' },
+        { keywords: ['bb preamp', 'bbpreamp'], name: 'Xotic BB Preamp' },
+        { keywords: ['centavo'], name: 'WARM AUDIO Centavo' },
+        { keywords: ['warmdrive', 'warm drive'], name: 'WARM AUDIO Warmdrive' },
+        { keywords: ['micro amp', 'microamp'], name: 'MXR Micro Amp' },
+
+        // --- ディストーション / ファズ系 ---
+        { keywords: ['ds-1', 'ds1', 'distortion'], name: 'BOSS DS-1 Distortion' },
+        { keywords: ['mt-2', 'mt2', 'metal zone', 'metalzone'], name: 'BOSS MT-2 Metal Zone' },
+        { keywords: ['hm-2', 'hm2', 'heavy metal', 'heavymetal'], name: 'BOSS HM-2 Heavy Metal' },
+        { keywords: ['rat', 'rat2', 'proco rat', 'procorat'], name: 'Proco RAT2' },
+        { keywords: ['guvnor', 'guv\'nor'], name: 'Marshall The Guv\'nor' },
+        { keywords: ['shredmaster', 'shred master', 'shredmaster'], name: 'Marshall ShredMaster' },
+        { keywords: ['bluesbreaker', 'blues breaker'], name: 'Marshall Bluesbreaker' },
+        { keywords: ['distortion+', 'dist+'], name: 'MXR Distortion+' },
+        { keywords: ['5150 overdrive', '5150 od', 'mxr 5150', '5150overdrive', '5150od', 'mxr5150'], name: 'MXR 5150 Overdrive' },
+        { keywords: ['big muff', 'bigmuff'], name: 'Electro-Harmonix Big Muff Pi' },
+        { keywords: ['sf300', 'super fuzz', 'superfuzz'], name: 'Behringer SF300 Super Fuzz' },
+        { keywords: ['to800', 'vintage tube overdrive', 'vintagetubeoverdrive'], name: 'Behringer TO800' },
+
+        // --- ベース用プリアンプ ---
+        { keywords: ['sansamp', 'bddi', 'bass driver', 'bassdriver', 'sabddi'], name: 'Tech21 SansAmp Bass Driver DI' },
+        { keywords: ['b7k', 'darkglass b7k', 'microtubes b7k', 'darkglassb7k', 'microtubesb7k'], name: 'Darkglass Microtubes B7K' },
+        { keywords: ['alpha omega', 'alphaomega'], name: 'Darkglass Alpha·Omega' },
+
+        // --- その他 ---
         { keywords: ["klon", "centaur", "kloncentaur", "klone"], name: "Klon Centaur" },
-        { keywords: ["sd1", "superoverdrive"], name: "BOSS SD-1" },
-        { keywords: ["bd2", "bluesdriver"], name: "BOSS BD-2" },
-        { keywords: ["ds1"], name: "BOSS DS-1" },
-        { keywords: ["mt2", "metalzone"], name: "BOSS MT-2 Metal Zone" },
-        { keywords: ["hm2", "heavymetal"], name: "BOSS HM-2" },
-        { keywords: ["procorat", "rat2", "ratpedal", "rat"], name: "ProCo RAT" },
         { keywords: ["ocd", "fulltoneocd"], name: "Fulltone OCD" },
         { keywords: ["timmy"], name: "Timmy Overdrive" },
         { keywords: ["precisiondrive", "horizondevices"], name: "Precision Drive" },
-        { keywords: ["bigmuff"], name: "Electro-Harmonix Big Muff" },
         { keywords: ["fuzzface"], name: "Fuzz Face" },
-        { keywords: ["sansamp", "sansamp", "bassdriverdi", "sabddi"], name: "Tech21 SansAmp Bass Driver DI" },
-        { keywords: ["odb3", "odb3", "bassoverdrive"], name: "BOSS ODB-3" },
-        { keywords: ["bassbigmuff", "bassbigmuff", "bassmuff"], name: "EHX Bass Big Muff" },
-        { keywords: ["b7k", "darkglassb7k"], name: "Darkglass B7K" }
+        { keywords: ["odb3", "bassoverdrive"], name: "BOSS ODB-3" },
+        { keywords: ["bassbigmuff", "bassmuff"], name: "EHX Bass Big Muff" }
     ];
 
     // 2.5 マイク辞書（マッピングテーブル）
@@ -98,7 +127,10 @@ const guessFromFilename = (filename: string, customDict: any[] = []) => {
 
     for (const entry of customAmps) {
         const kws = entry.keyword.split(',').map((k: string) => k.trim().toLowerCase());
-        if (kws.some((kw: string) => normalizedNameForDict.includes(kw) || nameWithSpaces.includes(kw))) {
+        if (kws.some((kw: string) => {
+            const normalizedKw = kw.toLowerCase().replace(/[\s_\-]/g, '');
+            return normalizedNameForDict.includes(normalizedKw) || nameWithSpaces.includes(kw);
+        })) {
             amp = entry.name;
             break;
         }
@@ -113,7 +145,10 @@ const guessFromFilename = (filename: string, customDict: any[] = []) => {
     const customModels = customDict.filter(d => d.category.toLowerCase() === 'model');
     for (const entry of customModels) {
         const kws = entry.keyword.split(',').map((k: string) => k.trim().toLowerCase());
-        if (kws.some((kw: string) => normalizedNameForDict.includes(kw) || nameWithSpaces.includes(kw))) {
+        if (kws.some((kw: string) => {
+            const normalizedKw = kw.toLowerCase().replace(/[\s_\-]/g, '');
+            return normalizedNameForDict.includes(normalizedKw) || nameWithSpaces.includes(kw);
+        })) {
             model = entry.name;
             break;
         }
@@ -122,10 +157,11 @@ const guessFromFilename = (filename: string, customDict: any[] = []) => {
     if (!model) {
         for (const entry of pedalDictionary) {
             if (entry.keywords.some((kw: string) => {
-                if (kw === 'rat') {
+                const normalizedKw = kw.toLowerCase().replace(/[\s_\-]/g, '');
+                if (normalizedKw === 'rat') {
                     return /\brat\b/i.test(nameWithSpaces);
                 }
-                return normalizedNameForDict.includes(kw);
+                return normalizedNameForDict.includes(normalizedKw) || nameWithSpaces.includes(kw.toLowerCase());
             })) {
                 model = entry.name;
                 break;
