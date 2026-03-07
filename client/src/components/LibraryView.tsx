@@ -252,7 +252,11 @@ export const LibraryView = ({ token }: LibraryViewProps) => {
                                             {selectedItem.type || (isNamItem(selectedItem) ? 'NAM' : 'IR')}
                                         </span>
                                     )}
-                                    {renderStars(isEditing ? (editForm?.rate || 0) : selectedItem.rate, "w-4 h-4", isEditing ? (s) => editForm && setEditForm({ ...editForm, rate: s }) : undefined)}
+                                    {renderStars(isEditing ? (editForm?.rate || 0) : selectedItem.rate, "w-4 h-4",
+                                        isEditing
+                                            ? (s) => editForm && setEditForm({ ...editForm, rate: s })
+                                            : (s) => handleDirectRateUpdate(selectedItem, s)
+                                    )}
                                 </div>
                                 <div className="flex items-center gap-1">
                                     {!isEditing
@@ -277,7 +281,7 @@ export const LibraryView = ({ token }: LibraryViewProps) => {
                             )}
                             {/* Row 3: Filename, Author, Source */}
                             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
-                                <span className="text-neutral-600 font-mono truncate max-w-[200px]">{selectedItem.originalName}</span>
+                                <span className="text-neutral-600 font-mono break-all">{selectedItem.originalName}</span>
                                 <div className="flex items-center gap-1 text-neutral-400">
                                     <User className="w-3 h-3 text-neutral-600" />
                                     {selectedItem.author || 'Unknown Author'}
@@ -446,7 +450,7 @@ export const LibraryView = ({ token }: LibraryViewProps) => {
                                         {t.icon}
                                         {item.type || (nam ? 'NAM' : 'IR')}
                                     </span>
-                                    {renderStars(item.rate, "w-3 h-3", (s) => handleDirectRateUpdate(item, s))}
+                                    {renderStars(item.rate)}
                                 </div>
                                 {/* Title */}
                                 <h3 className={`text-base font-bold text-white group-hover:${t.accent} truncate mb-1 transition-colors`}>
@@ -509,7 +513,7 @@ export const LibraryView = ({ token }: LibraryViewProps) => {
                                 return (
                                     <tr key={i} onClick={() => setSelectedItem(item)}
                                         className="border-b border-neutral-700/20 hover:bg-neutral-700/20 cursor-pointer transition-colors group">
-                                        <td className="px-4 py-3">{renderStars(item.rate, "w-3 h-3", (s) => handleDirectRateUpdate(item, s))}</td>
+                                        <td className="px-4 py-3">{renderStars(item.rate)}</td>
                                         <td className="px-4 py-3">
                                             <span className={`flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded-lg w-fit ${nam ? 'bg-indigo-500/15 text-indigo-400' : 'bg-emerald-500/15 text-emerald-400'}`}>
                                                 {nam ? <Zap className="w-2.5 h-2.5" /> : <Waves className="w-2.5 h-2.5" />}

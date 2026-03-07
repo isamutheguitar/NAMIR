@@ -116,7 +116,7 @@ export const AnalysisResultList = ({ results, onUpdate, token }: AnalysisResultL
                                     </div>
                                 )}
                                 <div className="truncate w-full relative group min-w-0 flex-grow">
-                                    <span className="text-sm font-mono text-neutral-400 truncate w-full block break-all">
+                                    <span className="text-[13px] font-mono text-neutral-400 w-full block break-all whitespace-normal">
                                         {item.originalName}
                                     </span>
                                     {/* Tooltip for long filenames */}
