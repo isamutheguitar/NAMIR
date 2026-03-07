@@ -231,6 +231,18 @@ export const AnalysisResultList = ({ results, onUpdate, token }: AnalysisResultL
                                 )}
 
                                 <div className="space-y-3 pt-2 border-t border-neutral-700/30">
+                                    {/* Author Editor */}
+                                    <div>
+                                        <label className="text-[10px] text-neutral-500 uppercase font-bold mb-1 block">Author / Creator</label>
+                                        <input
+                                            type="text"
+                                            value={item.author || ''}
+                                            onChange={(e) => onUpdate(item.id, { author: e.target.value })}
+                                            className="w-full bg-neutral-900 border border-neutral-700 rounded px-2 py-1.5 focus:border-indigo-500 outline-none"
+                                            placeholder="Unknown"
+                                        />
+                                    </div>
+
                                     {/* Rate Selector */}
                                     <div>
                                         <label className="text-[10px] text-neutral-500 uppercase font-bold mb-1 block">Rate / Evaluation</label>

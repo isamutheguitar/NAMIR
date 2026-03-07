@@ -101,6 +101,24 @@ export const LibraryView = ({ token }: LibraryViewProps) => {
         finally { setIsRestoring(false); }
     };
 
+    const handleDirectRateUpdate = async (item: LibraryItem, newRate: number) => {
+        // Optimistic UI Update
+        const updatedItem = { ...item, rate: newRate };
+        setItems(prevItems => prevItems.map(i => i.originalName === item.originalName ? updatedItem : i));
+        if (selectedItem?.originalName === item.originalName) setSelectedItem(updatedItem);
+
+        try {
+            const res = await fetch('/api/save-to-sheet', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ results: [updatedItem] })
+            });
+            if (!res.ok) fetchLibrary(); // Revert on fail
+        } catch {
+            fetchLibrary(); // Revert on fail
+        }
+    };
+
     const isNamItem = (item: LibraryItem) => item.originalName.toLowerCase().endsWith('.nam');
 
     const filteredItems = items
@@ -125,6 +143,7 @@ export const LibraryView = ({ token }: LibraryViewProps) => {
             const getName = (i: LibraryItem) => isNamItem(i) ? (i.amp || 'Unknown') : (i.cabinet || 'Unknown');
             switch (sortConfig.key) {
                 case 'name': fA = getName(a); fB = getName(b); break;
+                case 'filename': fA = a.originalName.toLowerCase(); fB = b.originalName.toLowerCase(); break;
                 case 'date': fA = new Date(a.date).getTime(); fB = new Date(b.date).getTime(); break;
                 case 'rate': fA = a.rate || 0; fB = b.rate || 0; break;
                 case 'author': fA = (a.author || '').toLowerCase(); fB = (b.author || '').toLowerCase(); break;
@@ -134,12 +153,17 @@ export const LibraryView = ({ token }: LibraryViewProps) => {
             return (fA > fB ? 1 : -1) * dir;
         });
 
-    const renderStars = (rate: number, size = "w-3 h-3", interactive = false) => (
+    const renderStars = (rate: number, size = "w-3 h-3", onSelect?: (rate: number) => void) => (
         <div className="flex gap-0.5">
             {[1, 2, 3, 4, 5].map(s => (
                 <Star key={s}
-                    onClick={() => interactive && editForm && setEditForm({ ...editForm, rate: s })}
-                    className={`${size} ${s <= rate ? 'fill-yellow-400 text-yellow-400' : 'text-neutral-600'} ${interactive ? 'cursor-pointer hover:scale-110 transition-transform' : ''}`}
+                    onClick={(e) => {
+                        if (onSelect) {
+                            e.stopPropagation();
+                            onSelect(s);
+                        }
+                    }}
+                    className={`${size} ${s <= rate ? 'fill-yellow-400 text-yellow-400' : 'text-neutral-600'} ${onSelect ? 'cursor-pointer hover:scale-110 transition-transform' : ''}`}
                 />
             ))}
         </div>
@@ -228,7 +252,7 @@ export const LibraryView = ({ token }: LibraryViewProps) => {
                                             {selectedItem.type || (isNamItem(selectedItem) ? 'NAM' : 'IR')}
                                         </span>
                                     )}
-                                    {renderStars(isEditing ? (editForm?.rate || 0) : selectedItem.rate, "w-4 h-4", isEditing)}
+                                    {renderStars(isEditing ? (editForm?.rate || 0) : selectedItem.rate, "w-4 h-4", isEditing ? (s) => editForm && setEditForm({ ...editForm, rate: s }) : undefined)}
                                 </div>
                                 <div className="flex items-center gap-1">
                                     {!isEditing
@@ -369,6 +393,7 @@ export const LibraryView = ({ token }: LibraryViewProps) => {
                             <option value="rate-desc">Rating ▼</option>
                             <option value="date-desc">Newest</option>
                             <option value="name-asc">Name A-Z</option>
+                            <option value="filename-asc">File Name A-Z</option>
                             <option value="author-asc">Author A-Z</option>
                         </select>
                     </div>
@@ -421,7 +446,7 @@ export const LibraryView = ({ token }: LibraryViewProps) => {
                                         {t.icon}
                                         {item.type || (nam ? 'NAM' : 'IR')}
                                     </span>
-                                    {renderStars(item.rate)}
+                                    {renderStars(item.rate, "w-3 h-3", (s) => handleDirectRateUpdate(item, s))}
                                 </div>
                                 {/* Title */}
                                 <h3 className={`text-base font-bold text-white group-hover:${t.accent} truncate mb-1 transition-colors`}>
@@ -472,6 +497,7 @@ export const LibraryView = ({ token }: LibraryViewProps) => {
                                 <th className="px-4 py-3">Rate</th>
                                 <th className="px-4 py-3">Type</th>
                                 <th className="px-4 py-3">Name</th>
+                                <th className="px-4 py-3">File Name</th>
                                 <th className="px-4 py-3 hidden md:table-cell">Author</th>
                                 <th className="px-4 py-3 hidden lg:table-cell">Memo</th>
                                 <th className="px-4 py-3">Date</th>
@@ -483,15 +509,18 @@ export const LibraryView = ({ token }: LibraryViewProps) => {
                                 return (
                                     <tr key={i} onClick={() => setSelectedItem(item)}
                                         className="border-b border-neutral-700/20 hover:bg-neutral-700/20 cursor-pointer transition-colors group">
-                                        <td className="px-4 py-3">{renderStars(item.rate)}</td>
+                                        <td className="px-4 py-3">{renderStars(item.rate, "w-3 h-3", (s) => handleDirectRateUpdate(item, s))}</td>
                                         <td className="px-4 py-3">
                                             <span className={`flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded-lg w-fit ${nam ? 'bg-indigo-500/15 text-indigo-400' : 'bg-emerald-500/15 text-emerald-400'}`}>
                                                 {nam ? <Zap className="w-2.5 h-2.5" /> : <Waves className="w-2.5 h-2.5" />}
                                                 {item.type || (nam ? 'NAM' : 'IR')}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-3 font-semibold text-white group-hover:text-indigo-300 transition-colors max-w-[180px] truncate">
+                                        <td className="px-4 py-3 font-semibold text-white group-hover:text-indigo-300 transition-colors max-w-[150px] truncate" title={nam ? (item.amp || item.originalName) : (item.cabinet || item.amp || item.originalName)}>
                                             {nam ? (item.amp || item.originalName) : (item.cabinet || item.amp || item.originalName)}
+                                        </td>
+                                        <td className="px-4 py-3 text-neutral-400 font-mono text-xs max-w-[150px] truncate" title={item.originalName}>
+                                            {item.originalName}
                                         </td>
                                         <td className="px-4 py-3 text-neutral-400 hidden md:table-cell max-w-[120px] truncate">{item.author || '—'}</td>
                                         <td className="px-4 py-3 text-neutral-500 hidden lg:table-cell max-w-[200px]">
