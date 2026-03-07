@@ -523,7 +523,7 @@ export const LibraryView = ({ token }: LibraryViewProps) => {
                                         <td className="px-4 py-3 font-semibold text-white group-hover:text-indigo-300 transition-colors max-w-[150px] truncate" title={nam ? (item.amp || item.originalName) : (item.cabinet || item.amp || item.originalName)}>
                                             {nam ? (item.amp || item.originalName) : (item.cabinet || item.amp || item.originalName)}
                                         </td>
-                                        <td className="px-4 py-3 text-neutral-400 font-mono text-xs max-w-[150px] truncate" title={item.originalName}>
+                                        <td className="px-4 py-3 text-neutral-400 font-mono text-xs max-w-[250px] break-all whitespace-normal">
                                             {item.originalName}
                                         </td>
                                         <td className="px-4 py-3 text-neutral-400 hidden md:table-cell max-w-[120px] truncate">{item.author || '—'}</td>

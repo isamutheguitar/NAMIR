@@ -115,7 +115,7 @@ export const AnalysisResultList = ({ results, onUpdate, token }: AnalysisResultL
                                         <FileAudio className="w-5 h-5 text-emerald-400" />
                                     </div>
                                 )}
-                                <div className="truncate w-full relative group min-w-0 flex-grow">
+                                <div className="w-full relative group min-w-0 flex-grow">
                                     <span className="text-[13px] font-mono text-neutral-400 w-full block break-all whitespace-normal">
                                         {item.originalName}
                                     </span>
