@@ -36,6 +36,7 @@ export interface AnalysisResult {
     userMemo?: string;
     rate?: number;
     metadata?: any;
+    filePath?: string;
 }
 
 export interface LibraryItem {
@@ -53,6 +54,13 @@ export interface LibraryItem {
     userMemo: string;
     mic: string;
     rate: number;
+    // IR WAV metadata
+    sampleRate?: number;
+    bitDepth?: number;
+    lengthMs?: number;
+    lengthSamples?: number;
+    // Optional file path for Explorer integration
+    filePath?: string;
 }
 
 export interface CustomDictItem {
@@ -60,4 +68,15 @@ export interface CustomDictItem {
     category: string;
     keyword: string;
     name: string;
+}
+
+/** 機材辞書エントリ（GearDictionaryシート用） */
+export interface GearSpec {
+    id?: string;
+    name: string;           // 機材名
+    requireSampleRate: number;  // 要求サンプルレート (Hz)
+    maxBitDepth: number;        // 上限ビット深度 (bit)
+    maxLengthMs: number;
+    displayFlag?: boolean;
+    caution?: string;
 }

@@ -1,0 +1,41 @@
+Release v1.1.0: Gear Filter & IR Library Update
+
+feat: separate library view into NAM and IR tabs
+
+ライブラリ画面を「NAM」と「IR」の2つのタブに分離しました。
+検索やソート、スプレッドシートの連携機能は共通化されたまま、より直感的にデータを管理できるようになります。
+
+feat: add automatic WAV metadata extraction on file drop
+
+IR用WAVファイルをドラッグ＆ドロップで登録した際、WAVヘッダを自動解析する機能を追加しました。
+「サンプルレート」「ビット深度」「長さ(ms)」を自動的に取得し、データベースに記録します。
+
+feat: implement dynamic gear filter system linked to Gear_Profiles sheet
+
+Gear_Profilesシートと連動する動的な機材フィルター機能を追加しました。
+ハードウェアの制限（SampleRate / BitDepth / Length）に合わせて、安全にIRファイルを絞り込めるようになります。
+
+feat: add length limit warning badge and caution tooltips for IR files
+
+選択した機材の制限長を超えるIRファイルに対して、「Length Limit Warning (⚠️)」バッジを表示する機能を追加しました。
+また、シートのCaution列を読み取り、機材ごとの特記事項をツールチップとして表示します。
+
+refactor: localize all user-facing UI elements to English
+
+UI上のすべてのテキスト、ボタン、ラベル、警告メッセージを完全に英語に翻訳・統一しました。
+グローバルでの使用に向けた、よりクリーンで一貫性のあるデザインになります。
+
+refactor: remove OS file explorer execution due to browser security constraints
+
+Vercel環境およびブラウザのセキュリティ制限を遵守するため、ローカルのエクスプローラーを起動する機能（/open-explorer）を削除しました。
+代替として、クリップボードで手動管理できる一貫したUIに変更しています。
+
+refactor: update spreadsheet schema (FilePath, SampleRate, BitDepth, SampleTimeMs, SampleCount)
+
+メインのデータベース（Sheet1）のカラム構成を再定義しました。
+O列から順に FilePath, SampleRate, BitDepth, SampleTimeMs, SampleCount となるように整理・最適化しています。
+
+fix: correct API header parsing to dynamically map Display_Flag and Caution columns
+
+Gear_Profilesシートの読み書きにおいて、APIがヘッダー行を正しく解析できない一部のバグを修正しました。
+これにより、ユーザーが任意で「備考列」などを追加しても、必須カラム（Display_Flag, Caution）を見失わず安全にデータをマージできるようになります。

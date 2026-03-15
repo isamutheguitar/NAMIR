@@ -19,13 +19,62 @@ export const FileUploader = ({ onResults, token }: FileUploaderProps) => {
             const filesPayload = await Promise.all(
                 acceptedFiles.map(async (file) => {
                     let content = '';
+                    let wavMeta: { sampleRate?: number; bitDepth?: number; totalSamples?: number } = {};
+
                     // Only read content for .nam files since IR analysis uses just the filename
                     if (file.name.toLowerCase().endsWith('.nam')) {
                         content = await file.text();
+                    } else if (file.name.toLowerCase().endsWith('.wav')) {
+                        // WAVヘッダ解析（RIFFフォーマット）
+                        try {
+                            const arrayBuffer = await file.arrayBuffer();
+                            const view = new DataView(arrayBuffer);
+                            // RIFF チェック
+                            const riff = String.fromCharCode(view.getUint8(0), view.getUint8(1), view.getUint8(2), view.getUint8(3));
+                            if (riff === 'RIFF') {
+                                // fmt チャンクを検索
+                                let offset = 12;
+                                while (offset < Math.min(arrayBuffer.byteLength - 8, 4096)) {
+                                    const chunkId = String.fromCharCode(
+                                        view.getUint8(offset), view.getUint8(offset + 1),
+                                        view.getUint8(offset + 2), view.getUint8(offset + 3)
+                                    );
+                                    const chunkSize = view.getUint32(offset + 4, true);
+                                    if (chunkId === 'fmt ') {
+                                        // audioFormat(2) + numChannels(2) + sampleRate(4) + byteRate(4) + blockAlign(2) + bitsPerSample(2)
+                                        const numChannels = view.getUint16(offset + 10, true);
+                                        const sampleRate = view.getUint32(offset + 12, true);
+                                        const bitDepth = view.getUint16(offset + 22, true);
+                                        // dataチャンクを検索してサンプル数を計算
+                                        let dataOffset = offset + 8 + chunkSize;
+                                        let totalSamples: number | undefined;
+                                        while (dataOffset < Math.min(arrayBuffer.byteLength - 8, 8192)) {
+                                            const dataChunkId = String.fromCharCode(
+                                                view.getUint8(dataOffset), view.getUint8(dataOffset + 1),
+                                                view.getUint8(dataOffset + 2), view.getUint8(dataOffset + 3)
+                                            );
+                                            const dataChunkSize = view.getUint32(dataOffset + 4, true);
+                                            if (dataChunkId === 'data') {
+                                                const bytesPerSample = bitDepth / 8;
+                                                totalSamples = Math.floor(dataChunkSize / (bytesPerSample * numChannels));
+                                                break;
+                                            }
+                                            dataOffset += 8 + dataChunkSize;
+                                        }
+                                        wavMeta = { sampleRate, bitDepth, totalSamples };
+                                        break;
+                                    }
+                                    offset += 8 + chunkSize;
+                                }
+                            }
+                        } catch (e) {
+                            console.warn('WAV header parse failed:', e);
+                        }
                     }
                     return {
                         filename: file.name,
                         content,
+                        wavMeta,
                     };
                 })
             );

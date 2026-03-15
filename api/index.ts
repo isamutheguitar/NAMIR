@@ -5,6 +5,8 @@ import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
 import { analyzeFile } from './utils/analysis.js';
+import { exec } from 'child_process';
+import path from 'path';
 
 dotenv.config();
 
@@ -80,12 +82,16 @@ router.post('/auth/google', async (req, res) => {
 });
 
 // 2. Get Library
+// スプレッドシート列マッピング:
+// A=date, B=originalName, C=suggestedName, D=amp, E=model, F=cabinet,
+// G=author, H=tone, I=type, J=sourceUrl, K=captureInfo, L=userMemo,
+// M=mic, N=rate, O=sampleRate, P=bitDepth, Q=lengthMs, R=lengthSamples, S=filePath
 router.get('/get-library', authenticateToken, async (req, res) => {
     try {
         const spreadsheetId = process.env.GOOGLE_SHEET_ID;
         const response = await sheets.spreadsheets.values.get({
             spreadsheetId: spreadsheetId!,
-            range: 'Sheet1!A3:N',
+            range: 'Sheet1!A3:S',
         });
         const rows = response.data.values || [];
         const items = rows.map(row => ({
@@ -102,7 +108,12 @@ router.get('/get-library', authenticateToken, async (req, res) => {
             captureInfo: row[10] || '',
             userMemo: row[11] || '',
             mic: row[12] || '',
-            rate: Number(row[13]) || 0
+            rate: Number(row[13]) || 0,
+            filePath: row[14] || '',
+            sampleRate: row[15] ? Number(row[15]) : undefined,
+            bitDepth: row[16] ? Number(row[16]) : undefined,
+            lengthMs: row[17] ? Number(row[17]) : undefined,
+            lengthSamples: row[18] ? Number(row[18]) : undefined,
         }));
         res.json({ items });
     } catch (error) { res.status(500).json({ error: 'Fetch failed' }); }
@@ -124,7 +135,7 @@ router.post('/analyze', authenticateToken, async (req, res) => {
                 // Fetch existing records for pre-fill
                 const existingData = await sheets.spreadsheets.values.get({
                     spreadsheetId,
-                    range: 'Sheet1!B:N',
+                    range: 'Sheet1!B:S',
                 });
                 const rows = existingData.data.values || [];
                 rows.forEach(row => {
@@ -136,7 +147,12 @@ router.post('/analyze', authenticateToken, async (req, res) => {
                         captureInfo: row[9] || '',
                         userMemo: row[10] || '',
                         mic: row[11] || '',
-                        rate: row[12] || 0
+                        rate: row[12] || 0,
+                        filePath: row[13] || '',
+                        sampleRate: row[14] ? Number(row[14]) : undefined,
+                        bitDepth: row[15] ? Number(row[15]) : undefined,
+                        lengthMs: row[16] ? Number(row[16]) : undefined,
+                        lengthSamples: row[17] ? Number(row[17]) : undefined,
                     });
                 });
 
@@ -162,6 +178,20 @@ router.post('/analyze', authenticateToken, async (req, res) => {
                 result.captureInfo = existing.captureInfo;
                 result.userMemo = existing.userMemo;
                 result.rate = Number(existing.rate) || 0;
+            }
+
+            // WAVメタデータを解析結果に付加
+            if (file.wavMeta && result.type === 'ir') {
+                const { sampleRate, bitDepth, totalSamples } = file.wavMeta;
+                (result as any).sampleRate = sampleRate || (existing?.sampleRate);
+                (result as any).bitDepth = bitDepth || (existing?.bitDepth);
+                if (sampleRate && totalSamples) {
+                    (result as any).lengthMs = Math.round((totalSamples / sampleRate) * 1000);
+                    (result as any).lengthSamples = totalSamples;
+                } else {
+                    (result as any).lengthMs = existing?.lengthMs;
+                    (result as any).lengthSamples = existing?.lengthSamples;
+                }
             }
             return result;
         });
@@ -192,12 +222,19 @@ router.post('/save-to-sheet', authenticateToken, async (req, res) => {
                 item.amp || '', item.model || '', item.cabinet || '',
                 item.author || '', item.tone || '', (item.type || 'UNKNOWN').toUpperCase(),
                 item.sourceUrl || '', item.captureInfo || '', item.userMemo || '',
-                item.mic || '', item.rate || 0
+                item.mic || '', item.rate || 0,
+                // ファイルパス (列O)
+                item.filePath || '',
+                // WAVメタデータ (列P〜S)
+                item.sampleRate || '',
+                item.bitDepth || '',
+                item.lengthMs || '',
+                item.lengthSamples || '',
             ];
 
             const rowIndex = currentNames.indexOf(originalName);
             if (rowIndex !== -1) {
-                dataToUpdate.push({ range: `Sheet1!A${rowIndex + 1}:N${rowIndex + 1}`, values: [row] });
+                dataToUpdate.push({ range: `Sheet1!A${rowIndex + 1}:S${rowIndex + 1}`, values: [row] });
             } else { dataToAppend.push(row); }
         }
 
@@ -210,7 +247,7 @@ router.post('/save-to-sheet', authenticateToken, async (req, res) => {
         if (dataToAppend.length > 0) {
             await sheets.spreadsheets.values.append({
                 spreadsheetId,
-                range: 'Sheet1!A:N',
+                range: 'Sheet1!A:S',
                 valueInputOption: 'USER_ENTERED',
                 requestBody: { values: dataToAppend }
             });
@@ -238,7 +275,7 @@ router.get('/backups', authenticateToken, async (req, res) => {
 router.post('/backup', authenticateToken, async (req, res) => {
     try {
         const spreadsheetId = process.env.GOOGLE_SHEET_ID;
-        const response = await sheets.spreadsheets.values.get({ spreadsheetId: spreadsheetId!, range: 'Sheet1!A3:N' });
+        const response = await sheets.spreadsheets.values.get({ spreadsheetId: spreadsheetId!, range: 'Sheet1!A3:S' });
         const rows = response.data.values || [];
         const now = new Date();
         const jst = new Date(now.getTime() + (9 * 60 * 60 * 1000));
@@ -264,13 +301,11 @@ router.post('/backup', authenticateToken, async (req, res) => {
             const meta = await sheets.spreadsheets.get({ spreadsheetId: spreadsheetId! });
             const sheetsList = meta.data.sheets || [];
 
-            // Extract backup sheets with their ids and titles
             const backupSheets = sheetsList
                 .map(s => ({ id: s.properties?.sheetId, title: s.properties?.title || '' }))
                 .filter(s => s.title.toLowerCase().startsWith('backup_'))
-                .sort((a, b) => b.title.localeCompare(a.title)); // Reverse chronological sorting 
+                .sort((a, b) => b.title.localeCompare(a.title));
 
-            // Keep the latest 5, delete the rest
             if (backupSheets.length > 5) {
                 const sheetsToDelete = backupSheets.slice(5);
                 const deleteRequests = sheetsToDelete.map(s => ({
@@ -309,10 +344,10 @@ router.post('/restore', authenticateToken, async (req, res) => {
         }
         if (!sheetName) throw new Error('Sheet name is missing.');
 
-        const response = await sheets.spreadsheets.values.get({ spreadsheetId: spreadsheetId!, range: `${sheetName}!A1:N` });
+        const response = await sheets.spreadsheets.values.get({ spreadsheetId: spreadsheetId!, range: `${sheetName}!A1:S` });
         const rows = response.data.values || [];
 
-        await sheets.spreadsheets.values.clear({ spreadsheetId: spreadsheetId!, range: 'Sheet1!A3:N' });
+        await sheets.spreadsheets.values.clear({ spreadsheetId: spreadsheetId!, range: 'Sheet1!A3:S' });
 
         if (rows.length > 0) {
             await sheets.spreadsheets.values.update({
@@ -391,6 +426,110 @@ router.post('/dictionary', authenticateToken, async (req, res) => {
         res.json({ success: true });
     } catch (error: any) { res.status(500).json({ error: error.message }); }
 });
+
+// 10. Get Gear Profiles
+router.get('/gear-dictionary', authenticateToken, async (req, res) => {
+    try {
+        const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+        const meta = await sheets.spreadsheets.get({ spreadsheetId: spreadsheetId! });
+        const hasGearDict = meta.data.sheets?.some(s => s.properties?.title === 'Gear_Profiles');
+
+        if (!hasGearDict) {
+            await sheets.spreadsheets.batchUpdate({
+                spreadsheetId: spreadsheetId!,
+                requestBody: { requests: [{ addSheet: { properties: { title: 'Gear_Profiles' } } }] }
+            });
+            await sheets.spreadsheets.values.update({
+                spreadsheetId: spreadsheetId!,
+                range: 'Gear_Profiles!A1:E1',
+                valueInputOption: 'USER_ENTERED',
+                requestBody: { values: [['Name', 'RequireSampleRate', 'MaxBitDepth', 'MaxLengthMs', 'Display_Flag']] }
+            });
+            return res.json({ items: [] });
+        }
+
+        const response = await sheets.spreadsheets.values.get({
+            spreadsheetId: spreadsheetId!,
+            range: 'Gear_Profiles!A1:Z'
+        });
+        const rows = response.data.values || [];
+        if (rows.length === 0) return res.json({ items: [] });
+
+        const headers = rows[0].map((h: any) => String(h).toUpperCase().trim());
+        const displayIdx = headers.indexOf('DISPLAY_FLAG');
+        const cautionIdx = headers.indexOf('CAUTION');
+
+        const items = rows.slice(1).map((row, i) => {
+            const isFalse = displayIdx !== -1 && row[displayIdx] ? String(row[displayIdx]).toUpperCase().trim() === 'FALSE' : false;
+            return {
+                id: i.toString(),
+                name: row[0] || '',
+                requireSampleRate: Number(row[1]) || 0,
+                maxBitDepth: Number(row[2]) || 0,
+                maxLengthMs: Number(row[3]) || 0,
+                displayFlag: !isFalse,
+                caution: cautionIdx !== -1 && row[cautionIdx] ? String(row[cautionIdx]) : '',
+            };
+        }).filter(item => item.name);
+
+        res.json({ items });
+    } catch (error: any) { res.status(500).json({ error: error.message }); }
+});
+
+// 11. Save Gear Profiles
+router.post('/gear-dictionary', authenticateToken, async (req, res) => {
+    try {
+        const { items } = req.body;
+        const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+
+        const meta = await sheets.spreadsheets.get({ spreadsheetId: spreadsheetId! });
+        const hasGearDict = meta.data.sheets?.some(s => s.properties?.title === 'Gear_Profiles');
+        if (!hasGearDict) {
+            await sheets.spreadsheets.batchUpdate({
+                spreadsheetId: spreadsheetId!,
+                requestBody: { requests: [{ addSheet: { properties: { title: 'Gear_Profiles' } } }] }
+            });
+        }
+
+        const existingData = await sheets.spreadsheets.values.get({ spreadsheetId: spreadsheetId!, range: 'Gear_Profiles!A1:Z' });
+        const existingRows = existingData.data.values || [['Name', 'RequireSampleRate', 'MaxBitDepth', 'MaxLengthMs', 'Remarks', 'Display_Flag']];
+        const headers = existingRows[0];
+        const displayIdx = headers.findIndex(h => String(h).toUpperCase().trim() === 'DISPLAY_FLAG');
+        const dispCol = displayIdx >= 0 ? displayIdx : headers.length;
+        if (displayIdx < 0) headers[dispCol] = 'Display_Flag';
+
+        const cautionIdx = headers.findIndex(h => String(h).toUpperCase().trim() === 'CAUTION');
+        const cautCol = cautionIdx >= 0 ? cautionIdx : headers.length;
+        if (cautionIdx < 0) headers[cautCol] = 'Caution';
+
+        await sheets.spreadsheets.values.clear({ spreadsheetId: spreadsheetId!, range: 'Gear_Profiles!A:Z' });
+
+        const rows: any[][] = [headers];
+        (items || []).forEach((item: any) => {
+            const matchRow = existingRows.slice(1).find(r => r[0] === item.name);
+            const r = matchRow ? [...matchRow] : [item.name, item.requireSampleRate, item.maxBitDepth, item.maxLengthMs];
+            while (r.length <= Math.max(dispCol, cautCol)) r.push('');
+            r[0] = item.name;
+            r[1] = item.requireSampleRate;
+            r[2] = item.maxBitDepth;
+            r[3] = item.maxLengthMs;
+            r[dispCol] = item.displayFlag !== false ? 'TRUE' : 'FALSE';
+            r[cautCol] = item.caution || '';
+            rows.push(r);
+        });
+
+        await sheets.spreadsheets.values.update({
+            spreadsheetId: spreadsheetId!,
+            range: 'Gear_Profiles!A1',
+            valueInputOption: 'USER_ENTERED',
+            requestBody: { values: rows }
+        });
+
+        res.json({ success: true });
+    } catch (error: any) { res.status(500).json({ error: error.message }); }
+});
+
+
 
 app.use('/api', router);
 app.use('/', router);

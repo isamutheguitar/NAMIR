@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { AnalysisResult } from '../types';
-import { Settings, FileAudio, CheckCircle2, Edit3, Search, Database, Loader2, Link as LinkIcon, FileText, Tag } from 'lucide-react';
+import { Settings, FileAudio, CheckCircle2, Edit3, Search, Database, Loader2, Link as LinkIcon, FileText, Tag, FolderOpen } from 'lucide-react';
 
 
 interface AnalysisResultListProps {
@@ -227,10 +227,27 @@ export const AnalysisResultList = ({ results, onUpdate, token }: AnalysisResultL
                                                 className="w-full bg-neutral-900 border border-neutral-700 rounded px-2 py-1.5 focus:border-indigo-500 outline-none text-emerald-300"
                                             />
                                         </div>
+
+
                                     </div>
                                 )}
 
                                 <div className="space-y-3 pt-2 border-t border-neutral-700/30">
+                                    {/* File Path (Common) */}
+                                    <div>
+                                        <label className="text-[10px] text-neutral-500 uppercase font-bold mb-1 flex items-center gap-1">
+                                            <FolderOpen className="w-3 h-3 text-amber-400" /> File Path
+                                            <span className="normal-case text-neutral-600 font-normal ml-1">(for Open in Explorer)</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={item.filePath || ''}
+                                            onChange={(e) => onUpdate(item.id, { filePath: e.target.value })}
+                                            className="w-full bg-neutral-900 border border-amber-500/20 rounded px-2 py-1.5 focus:border-amber-500/60 outline-none text-amber-200/70 text-xs font-mono placeholder:text-neutral-700"
+                                            placeholder="C:\Users\...\myGear.wav"
+                                        />
+                                    </div>
+
                                     {/* Author Editor */}
                                     <div>
                                         <label className="text-[10px] text-neutral-500 uppercase font-bold mb-1 block">Author / Creator</label>
